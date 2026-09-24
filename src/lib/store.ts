@@ -45,6 +45,28 @@ interface State {
   stop: () => void;
 }
 
+/** Запись чатов на диск с дебаунсом — во время стриминга иначе сотни записей */
+let chatsTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingChats: Chat[] | null = null;
+
+function persistChats(chats: Chat[], immediate = false) {
+  pendingChats = chats;
+  if (chatsTimer) clearTimeout(chatsTimer);
+  const write = () => {
+    chatsTimer = null;
+    if (pendingChats) void setItem(CHATS_BLOB, JSON.stringify(pendingChats));
+    pendingChats = null;
+  };
+  if (immediate) write();
+  else chatsTimer = setTimeout(write, 500);
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && pendingChats) persistChats(pendingChats, true);
+  });
+}
+
 async function persistKeys(keys: ApiKey[], cryptoKey: CryptoKey | null) {
   const json = JSON.stringify(keys);
   if (cryptoKey) {
@@ -219,7 +241,7 @@ export const useStore = create<State>((set, get) => ({
     };
     const next = [chat, ...chats];
     set({ chats: next, activeChatId: chat.id });
-    void setItem(CHATS_BLOB, JSON.stringify(next));
+    persistChats(next, true);
     return chat.id;
   },
 
@@ -228,7 +250,7 @@ export const useStore = create<State>((set, get) => ({
   deleteChat: async (id) => {
     const chats = get().chats.filter((c) => c.id !== id);
     set({ chats, activeChatId: get().activeChatId === id ? null : get().activeChatId });
-    await setItem(CHATS_BLOB, JSON.stringify(chats));
+    persistChats(chats, true);
   },
 
   renameChat: async (id, title) => get().updateChat(id, { title }),
@@ -236,12 +258,12 @@ export const useStore = create<State>((set, get) => ({
   updateChat: async (id, patch) => {
     const chats = get().chats.map((c) => (c.id === id ? { ...c, ...patch, updatedAt: Date.now() } : c));
     set({ chats });
-    await setItem(CHATS_BLOB, JSON.stringify(chats));
+    persistChats(chats);
   },
 
   clearChats: async () => {
     set({ chats: [], activeChatId: null });
-    await setItem(CHATS_BLOB, '[]');
+    persistChats([], true);
   },
 
   deleteMessage: async (chatId, messageId) => {

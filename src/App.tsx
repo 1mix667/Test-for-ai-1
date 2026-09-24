@@ -13,6 +13,19 @@ export default function App() {
 
   useEffect(() => {
     void init();
+    let remove: (() => void) | undefined;
+    void (async () => {
+      const { Capacitor } = await import('@capacitor/core');
+      if (!Capacitor.isNativePlatform()) return;
+      const { App: CapApp } = await import('@capacitor/app');
+      const handle = await CapApp.addListener('backButton', () => {
+        // если открыт чат — возвращаемся к списку, иначе сворачиваем приложение
+        if (useStore.getState().activeChatId) useStore.getState().openChat(null);
+        else void CapApp.minimizeApp();
+      });
+      remove = () => void handle.remove();
+    })();
+    return () => remove?.();
   }, []);
 
   if (!ready) return <div className="empty" style={{ paddingTop: 120 }}>Загрузка…</div>;
