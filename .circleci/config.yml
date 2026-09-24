@@ -1,0 +1,40 @@
+# CircleCI — бесплатно ~6000 минут/мес. Подключение: circleci.com → Projects →
+# Set Up Project для этого репозитория → "Fastest: use existing config".
+# Готовый APK: вкладка Artifacts внутри запуска.
+version: 2.1
+
+jobs:
+  build-apk:
+    docker:
+      - image: cimg/android:2024.01-node
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Зависимости
+          command: npm ci
+      - run:
+          name: Сборка веб-части
+          command: npm run build
+      - run:
+          name: Синхронизация Capacitor
+          command: npx cap sync android
+      - run:
+          name: Gradle assembleDebug
+          command: |
+            cd android
+            chmod +x gradlew
+            ./gradlew assembleDebug --no-daemon
+      - run:
+          name: Переименовать APK
+          command: |
+            mkdir -p out
+            cp "$(find android/app/build/outputs/apk -name '*.apk' | head -n1)" out/AnyKeyChat.apk
+      - store_artifacts:
+          path: out/AnyKeyChat.apk
+          destination: AnyKeyChat.apk
+
+workflows:
+  android:
+    jobs:
+      - build-apk

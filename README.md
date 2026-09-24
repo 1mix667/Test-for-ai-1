@@ -27,13 +27,36 @@ Google Gemini, OpenRouter, Groq, DeepSeek, локального сервера �
 
 ## Как получить APK
 
-Сборка идёт в GitHub Actions (workflow `.github/workflows/android.yml`) — при каждом пуше.
+В репозитории лежат конфиги сразу для нескольких сборщиков — достаточно любого одного.
 
-1. Открой вкладку **Actions** в репозитории → workflow «Сборка Android APK».
-2. Готовый файл лежит в двух местах:
-   - **Releases → `android-latest` → `AnyKeyChat.apk`** — прямая ссылка, удобно открыть прямо с телефона;
-   - артефакт `AnyKeyChat-apk` внутри запуска workflow.
-3. На телефоне открой скачанный `AnyKeyChat.apk` и разреши установку из этого источника.
+### Вариант 1. Codemagic (рекомендую, 500 бесплатных минут/мес)
+
+1. [codemagic.io](https://codemagic.io) → войти через GitHub → **Add application** → выбрать этот репозиторий.
+2. Выбрать **Use codemagic.yaml** (файл `codemagic.yaml` уже в корне).
+3. **Start new build** → workflow `AnyKey Chat — Android APK` → ветка с кодом.
+4. Через ~5 минут в артефактах сборки будет `AnyKeyChat.apk` — можно скачать прямо на телефон.
+
+### Вариант 2. CircleCI (~6000 бесплатных минут/мес)
+
+1. [circleci.com](https://circleci.com) → войти через GitHub → **Projects** → **Set Up Project** для этого репозитория.
+2. Выбрать «Fastest — use the existing config» (`.circleci/config.yml`).
+3. После сборки APK лежит во вкладке **Artifacts** запуска.
+
+### Вариант 3. GitLab CI
+
+Зеркалишь репозиторий в GitLab — конфиг `.gitlab-ci.yml` соберёт APK, файл будет в артефактах job'а.
+
+### Вариант 4. GitHub Actions
+
+Workflow `.github/workflows/android.yml` собирает APK при каждом пуше и публикует его в релиз
+`android-latest` (прямая ссылка, удобно открыть с телефона). Работает только если на аккаунте
+GitHub не заблокированы Actions (при блокировке билдинга job падает с «account is locked due to a
+billing issue»).
+
+### Установка на телефон
+
+Открой скачанный `AnyKeyChat.apk` в файловом менеджере и разреши установку из этого источника
+(Android спросит сам).
 
 По умолчанию собирается **debug**-APK (устанавливается без проблем, но подпись меняется от сборки
 к сборке — при обновлении может потребоваться сначала удалить старую версию).
@@ -47,8 +70,7 @@ keytool -genkey -v -keystore release.keystore -alias anykey -keyalg RSA -keysize
 base64 -w0 release.keystore   # значение для ANDROID_KEYSTORE_B64
 ```
 
-Секреты: `ANDROID_KEYSTORE_B64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
-Дальше workflow сам соберёт подписанный release.
+Секреты: `ANDROID_KEYSTORE_B64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. (только для GitHub Actions).
 
 ## Локальная разработка
 

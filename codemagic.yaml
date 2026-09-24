@@ -1,0 +1,34 @@
+# Codemagic — бесплатно 500 минут/мес, Android SDK и JDK уже в образе.
+# Подключение: codemagic.io → Add application → GitHub → этот репозиторий →
+# "Use codemagic.yaml" → запустить workflow android-apk и выбрать ветку.
+# APK придёт письмом и будет в артефактах сборки.
+
+workflows:
+  android-apk:
+    name: AnyKey Chat — Android APK
+    instance_type: linux_x2
+    max_build_duration: 45
+    environment:
+      node: 20
+      java: 21
+    triggering:
+      events:
+        - push
+    scripts:
+      - name: Зависимости
+        script: npm ci
+      - name: Сборка веб-части
+        script: npm run build
+      - name: Синхронизация Capacitor
+        script: npx cap sync android
+      - name: Gradle assembleDebug
+        script: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - name: Переименовать APK
+        script: |
+          mkdir -p out
+          cp "$(find android/app/build/outputs/apk -name '*.apk' | head -n1)" out/AnyKeyChat.apk
+    artifacts:
+      - out/AnyKeyChat.apk

@@ -1,0 +1,19 @@
+# GitLab CI — вариант, если зеркалишь репозиторий в GitLab.
+# APK лежит в артефактах job'а (Build → Jobs → Download artifacts).
+image: cimg/android:2024.01-node
+
+stages: [build]
+
+android-apk:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+    - npx cap sync android
+    - cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon && cd ..
+    - mkdir -p out
+    - cp "$(find android/app/build/outputs/apk -name '*.apk' | head -n1)" out/AnyKeyChat.apk
+  artifacts:
+    name: AnyKeyChat-apk
+    paths: [out/AnyKeyChat.apk]
+    expire_in: 30 days
