@@ -1,0 +1,94 @@
+name: Сборка Android APK
+
+on:
+  push:
+    branches: ['**']
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Установка зависимостей
+        run: npm ci
+
+      - name: Сборка веб-части
+        run: npm run build
+
+      - name: Синхронизация с Android-проектом
+        run: npx cap sync android
+
+      - name: Права на gradlew
+        run: chmod +x android/gradlew
+
+      - name: Подготовка ключа подписи (если задан секрет)
+        id: sign
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > android/app/release.keystore
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Сборка debug APK
+        if: steps.sign.outputs.signed == 'false'
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Сборка release APK (подписанный)
+        if: steps.sign.outputs.signed == 'true'
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+
+      - name: Переименовать APK
+        run: |
+          mkdir -p out
+          APK=$(find android/app/build/outputs/apk -name '*.apk' | head -n1)
+          echo "Найден: $APK"
+          cp "$APK" out/AnyKeyChat.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AnyKeyChat-apk
+          path: out/AnyKeyChat.apk
+          if-no-files-found: error
+
+      - name: Опубликовать релиз с APK (прямая ссылка для телефона)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: AnyKey Chat — свежая сборка
+          body: |
+            APK для установки на телефон. Скачай AnyKeyChat.apk прямо с телефона и открой его.
+            Сборка из коммита ${{ github.sha }}.
+          prerelease: true
+          files: out/AnyKeyChat.apk
