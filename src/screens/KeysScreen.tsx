@@ -35,7 +35,7 @@ export default function KeysScreen() {
   return (
     <>
       <div className="pad">
-        <div className="row between" style={{ marginBottom: 12 }}>
+        <div className="row between wrap" style={{ marginBottom: 12 }}>
           <div className="col">
             <b className="ttl">Хранилище ключей</b>
             <span className="tiny">{keys.length} шт · хранятся только на этом телефоне</span>
@@ -53,11 +53,11 @@ export default function KeysScreen() {
           </button>
         </div>
 
-        <div className="row" style={{ gap: 10, marginBottom: 14 }}>
-          <button className="btn primary grow" onClick={() => { setEditing(null); setShowEditor(true); }}>
+        <div className="row wrap" style={{ gap: 10, marginBottom: 14 }}>
+          <button className="btn primary" onClick={() => { setEditing(null); setShowEditor(true); }}>
             <IconPlus size={18} /> Добавить ключ
           </button>
-          <button className="btn grow" onClick={() => setAutoOpen(true)}>
+          <button className="btn" onClick={() => setAutoOpen(true)}>
             <IconSearch size={18} /> Определить по ключу
           </button>
         </div>
@@ -99,7 +99,7 @@ export default function KeysScreen() {
 
       {current && (
         <Sheet title={current.name} onClose={() => setDetailsOf(null)}>
-          <div className="row between" style={{ marginBottom: 12 }}>
+          <div className="row between wrap" style={{ marginBottom: 12 }}>
             <StatusBadge status={current.status} />
             <span className="tiny">{current.checkedAt ? `проверен ${ago(current.checkedAt)}` : 'ещё не проверялся'}</span>
           </div>
