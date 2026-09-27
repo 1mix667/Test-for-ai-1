@@ -12,6 +12,7 @@ body {
   font-size: 15px;
   line-height: 1.45;
   overscroll-behavior-y: none;
+  overflow-x: clip;
 }
 
 .app {
@@ -31,6 +32,9 @@ body {
   border-radius: 26px;
   background: transparent;
   border: none;
+  /* канвас WebGL-стекла рисуется с запасом (bleed) за края элемента —
+     без clip он залезает на контент под шапкой */
+  overflow: hidden;
 }
 /* фолбэк без WebGL2: солидная пилюля */
 .topbar.glass-off {
@@ -62,6 +66,10 @@ body {
 .pad { padding: 16px 16px 8px; }
 
 .row { display: flex; align-items: center; }
+.row.wrap { flex-wrap: wrap; row-gap: 10px; }
+/* кнопки в переносимой строке: в тесноте встают друг под другом во всю ширину,
+   текст с nowrap никогда не вылезет на соседа */
+.row.wrap > .btn { flex: 1 1 220px; min-width: 0; }
 .col { display: flex; flex-direction: column; }
 .between { justify-content: space-between; }
 .grow { flex: 1; min-width: 0; }
@@ -102,6 +110,7 @@ body {
   justify-content: center;
   gap: 8px;
   white-space: nowrap;
+  overflow: hidden;
 }
 .btn:active { filter: brightness(1.18); }
 .btn:disabled { opacity: 0.45; }
@@ -136,6 +145,7 @@ body {
   color: var(--m3-primary);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
 }
 .fab.glass-off {
   background: var(--m3-primary-container);
@@ -269,6 +279,7 @@ body {
   background: transparent;
   border: none;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
 }
 /* фолбэк без WebGL2: обычное блюр-стекло */
 .dock.glass-off {
@@ -379,6 +390,7 @@ body {
   background: transparent;
   border-radius: 28px;
   padding: 6px 6px 6px 8px;
+  overflow: hidden;
 }
 .inputrow.glass-off { background: var(--m3-surface-container-high); }
 .inputrow textarea {

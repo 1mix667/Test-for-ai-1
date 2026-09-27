@@ -7,13 +7,13 @@ import ChatScreen from './screens/ChatScreen';
 import Dock, { type Tab } from './components/Dock';
 import { Field } from './components/ui';
 import { IconChat, IconLock, IconPlus, IconTrash } from './components/icons';
-import { useGlass } from './lib/liquid';
+import { useGlass, refreshGlass } from './lib/liquid';
 
 export default function App() {
   const { ready, locked, init, chats, activeChatId, openChat, newChat, deleteChat, keys, settings } = useStore();
   const [tab, setTab] = useState<Tab>('chats');
-  const topGlass = useGlass<HTMLDivElement>({ tint: 0.5, tintTone: 'dark', frost: 0.12, refraction: 88 });
-  const fabGlass = useGlass<HTMLButtonElement>({ tint: 0.45, tintTone: 'dark', frost: 0.1, refraction: 88 });
+  const topGlass = useGlass<HTMLDivElement>({ tint: 0.45, frost: 0.32, refraction: 30 });
+  const fabGlass = useGlass<HTMLButtonElement>({ tint: 0.42, frost: 0.3, refraction: 30 });
 
   useEffect(() => {
     void init();
@@ -36,6 +36,12 @@ export default function App() {
   useEffect(() => {
     if (ready) void applyTheme(settings.themeSeed);
   }, [ready, settings.themeSeed]);
+
+  // стекло в live:false — после смены таба фон под шапкой другой,
+  // помечаем его грязным, чтобы не остался старый слепок
+  useEffect(() => {
+    refreshGlass();
+  }, [tab]);
 
   if (!ready) return <div className="empty" style={{ paddingTop: 120 }}>Загрузка…</div>;
   if (locked) return <LockScreen />;
