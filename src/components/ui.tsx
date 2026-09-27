@@ -1,4 +1,5 @@
 import React from 'react';
+import { useGlass } from '../lib/liquid';
 
 export function Sheet({
   title,
@@ -9,9 +10,10 @@ export function Sheet({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  const glass = useGlass<HTMLDivElement>({ tint: 0.55, tintTone: 'dark', frost: 0.14, refraction: 88 });
   return (
     <div className="sheet-backdrop" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+      <div className="sheet" ref={glass} onClick={(e) => e.stopPropagation()}>
         <div className="grabber" />
         {title && <h2>{title}</h2>}
         {children}

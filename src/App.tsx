@@ -7,10 +7,13 @@ import ChatScreen from './screens/ChatScreen';
 import Dock, { type Tab } from './components/Dock';
 import { Field } from './components/ui';
 import { IconChat, IconLock, IconPlus, IconTrash } from './components/icons';
+import { useGlass } from './lib/liquid';
 
 export default function App() {
   const { ready, locked, init, chats, activeChatId, openChat, newChat, deleteChat, keys, settings } = useStore();
   const [tab, setTab] = useState<Tab>('chats');
+  const topGlass = useGlass<HTMLDivElement>({ tint: 0.5, tintTone: 'dark', frost: 0.12, refraction: 88 });
+  const fabGlass = useGlass<HTMLButtonElement>({ tint: 0.45, tintTone: 'dark', frost: 0.1, refraction: 88 });
 
   useEffect(() => {
     void init();
@@ -42,7 +45,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="topbar">
+      <div className="topbar" ref={topGlass}>
         <h1>
           {tab === 'chats' ? 'Чаты' : tab === 'keys' ? 'Ключи' : 'Настройки'}
           <span className="sub">
@@ -97,7 +100,7 @@ export default function App() {
         {tab === 'settings' && <SettingsScreen />}
 
         {tab === 'chats' && (
-          <button className="fab" aria-label="Новый чат" onClick={() => newChat()}>
+          <button className="fab" ref={fabGlass} aria-label="Новый чат" onClick={() => newChat()}>
             <IconPlus size={26} />
           </button>
         )}

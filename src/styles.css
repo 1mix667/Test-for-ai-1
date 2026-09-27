@@ -21,21 +21,21 @@ body {
   background: var(--m3-surface);
 }
 
-/* ---------- top bar ---------- */
+/* ---------- top bar: плавающая стеклянная пилюля ---------- */
 .topbar {
   position: sticky;
-  top: 0;
+  top: calc(10px + env(safe-area-inset-top));
   z-index: 20;
-  padding: calc(10px + env(safe-area-inset-top)) 20px 12px;
-  background: var(--m3-surface);
-  border-bottom: 1px solid color-mix(in srgb, var(--m3-outline-variant) 40%, transparent);
+  margin: 0 16px;
+  padding: 12px 20px;
+  border-radius: 26px;
+  background: transparent;
+  border: none;
 }
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .topbar {
-    background: color-mix(in srgb, var(--m3-surface) 82%, transparent);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-  }
+/* фолбэк без WebGL2: солидная пилюля */
+.topbar.glass-off {
+  background: var(--m3-surface-container);
+  border: 1px solid color-mix(in srgb, var(--m3-outline-variant) 45%, transparent);
 }
 .topbar h1 {
   margin: 0;
@@ -132,10 +132,14 @@ body {
   border-radius: 20px;
   border: none;
   cursor: pointer;
-  background: var(--m3-primary-container);
-  color: var(--m3-on-primary-container);
+  background: transparent;
+  color: var(--m3-primary);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.fab.glass-off {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
 }
 .fab:active { transform: scale(0.94); }
 
@@ -230,11 +234,12 @@ body {
 .sheet {
   width: 100%; max-width: 560px;
   max-height: 88dvh; overflow-y: auto;
-  background: var(--m3-surface-container-high);
+  background: transparent;
   border-radius: 28px 28px 0 0;
   padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
   animation: slideup 0.24s cubic-bezier(0.32, 0.72, 0.35, 1);
 }
+.sheet.glass-off { background: var(--m3-surface-container-high); }
 .sheet h2 { font-size: 19px; margin: 10px 0 14px; }
 .grabber {
   width: 36px; height: 4px; border-radius: 999px;
@@ -261,11 +266,16 @@ body {
   padding: 8px;
   border-radius: 34px;
   pointer-events: auto;
+  background: transparent;
+  border: none;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+/* фолбэк без WebGL2: обычное блюр-стекло */
+.dock.glass-off {
   background: color-mix(in srgb, var(--m3-surface-container) 68%, transparent);
   backdrop-filter: blur(26px) saturate(1.5);
   -webkit-backdrop-filter: blur(26px) saturate(1.5);
   border: 1px solid color-mix(in srgb, var(--m3-outline-variant) 55%, transparent);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 .dock .lens {
   position: absolute;
@@ -355,23 +365,22 @@ body {
   border-radius: 999px; padding: 7px 13px; font-size: 12.5px;
 }
 
-/* ---------- composer ---------- */
+/* ---------- composer: плавающая стеклянная пилюля ---------- */
 .composer {
   position: sticky;
   bottom: 0;
   z-index: 20;
   padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--m3-surface) 82%, transparent);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-top: 1px solid color-mix(in srgb, var(--m3-outline-variant) 40%, transparent);
+  background: transparent;
+  border-top: none;
 }
 .inputrow {
   display: flex; align-items: flex-end; gap: 8px;
-  background: var(--m3-surface-container-high);
+  background: transparent;
   border-radius: 28px;
   padding: 6px 6px 6px 8px;
 }
+.inputrow.glass-off { background: var(--m3-surface-container-high); }
 .inputrow textarea {
   flex: 1;
   background: transparent;

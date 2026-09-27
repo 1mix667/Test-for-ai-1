@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { IconChat, IconGear, IconKey } from './icons';
-import { glassify, refreshGlass, type LiquidGlass } from '../lib/liquid';
+import { glassify, refreshGlass, useGlass, type LiquidGlass } from '../lib/liquid';
 
 export type Tab = 'chats' | 'keys' | 'settings';
 
@@ -30,7 +30,7 @@ function haptic() {
  * WebGL2-шейдер с рефракцией (apple-liquid-glass-webgl).
  */
 export default function Dock({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
-  const dockRef = useRef<HTMLDivElement>(null);
+  const dockGlass = useGlass<HTMLDivElement>({ tint: 0.35, tintTone: 'dark', frost: 0.1, refraction: 88 });
   const lensRef = useRef<HTMLDivElement>(null);
   const btnRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const glassRef = useRef<LiquidGlass | null>(null);
@@ -148,7 +148,7 @@ export default function Dock({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void
 
   return (
     <div className="dock-wrap">
-      <div className="dock" ref={dockRef} role="tablist" aria-label="Навигация">
+      <div className="dock" ref={dockGlass} role="tablist" aria-label="Навигация">
         <div className="lens" ref={lensRef} aria-hidden />
         {TABS.map((t, i) => {
           const active = t.id === tab;

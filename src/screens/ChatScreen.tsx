@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { useStore, uid } from '../lib/store';
 import type { Attachment, Chat, Message } from '../lib/types';
 import { Field, Sheet } from '../components/ui';
+import { useGlass } from '../lib/liquid';
 import {
   IconBack, IconClip, IconDoc, IconGear, IconRefresh, IconSend, IconSparkle, IconStop,
 } from '../components/icons';
@@ -15,6 +16,8 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
   const [showSettings, setShowSettings] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const topGlass = useGlass<HTMLDivElement>({ tint: 0.5, tintTone: 'dark', frost: 0.12, refraction: 88 });
+  const inputGlass = useGlass<HTMLDivElement>({ tint: 0.5, tintTone: 'dark', frost: 0.12, refraction: 88 });
   const streaming = streamingChatId === chat.id;
   const key = keys.find((k) => k.id === chat.keyId);
   const atBottom = useRef(true);
@@ -54,7 +57,7 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
 
   return (
     <div className="app">
-      <div className="topbar topbar-row">
+      <div className="topbar topbar-row" ref={topGlass}>
         <button className="iconbtn" aria-label="Назад" onClick={onBack}>
           <IconBack size={22} />
         </button>
@@ -106,7 +109,7 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
             ))}
           </div>
         )}
-        <div className="inputrow">
+        <div className="inputrow" ref={inputGlass}>
           <button className="iconbtn" aria-label="Прикрепить файл" onClick={() => fileRef.current?.click()}>
             <IconClip size={20} />
           </button>
