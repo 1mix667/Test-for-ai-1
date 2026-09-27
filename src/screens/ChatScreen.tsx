@@ -57,22 +57,24 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
 
   return (
     <div className="app">
-      <div className="topbar topbar-row" ref={topGlass}>
-        <button className="iconbtn" aria-label="Назад" onClick={onBack}>
-          <IconBack size={22} />
-        </button>
-        <h1>
-          <span className="ttl">{chat.title}</span>
-          <span className="sub">
-            {key ? `${key.name} · ${chat.model ?? 'модель не выбрана'}` : 'ключ не выбран'}
-          </span>
-        </h1>
-        <button className="iconbtn" aria-label="Настройки чата" onClick={() => setShowSettings(true)}>
-          <IconGear size={22} />
-        </button>
-      </div>
-
       <div className="content" ref={scroller} onScroll={onScroll} style={{ paddingBottom: 12 }}>
+        {/* Шапка внутри скроллера: в покое в потоке, при скролле залипает
+            и плавает над сообщениями. */}
+        <div className="topbar topbar-row" ref={topGlass}>
+          <button className="iconbtn" aria-label="Назад" onClick={onBack}>
+            <IconBack size={22} />
+          </button>
+          <h1>
+            <span className="ttl">{chat.title}</span>
+            <span className="sub">
+              {key ? `${key.name} · ${chat.model ?? 'модель не выбрана'}` : 'ключ не выбран'}
+            </span>
+          </h1>
+          <button className="iconbtn" aria-label="Настройки чата" onClick={() => setShowSettings(true)}>
+            <IconGear size={22} />
+          </button>
+        </div>
+
         <div className="pad">
           {!chat.messages.length && (
             <div className="empty">

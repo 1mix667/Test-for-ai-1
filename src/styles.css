@@ -16,7 +16,10 @@ body {
 }
 
 .app {
-  min-height: 100dvh;
+  /* Ровно высота вьюпорта: скроллится только .content внутри.
+     С min-height:100dvh .app мог вырасти выше экрана и скроллился body —
+     тогда липкая шапка залипала относительно body и контент залезал под неё. */
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--m3-surface);
@@ -27,7 +30,11 @@ body {
   position: sticky;
   top: calc(10px + env(safe-area-inset-top));
   z-index: 20;
-  margin: 0 16px;
+  /* Шапка живёт внутри скроллящегося .content и плавает над контентом.
+     Верхний отступ нужен всегда, а не только в залипшем состоянии:
+     top срабатывает лишь когда шапка залипла, в покое без margin-top
+     она упёрлась бы в статус-бар. */
+  margin: calc(10px + env(safe-area-inset-top)) 16px 0;
   padding: 12px 20px;
   border-radius: 26px;
   background: transparent;
@@ -62,7 +69,9 @@ body {
 }
 
 /* ---------- content ---------- */
-.content { flex: 1; overflow-y: auto; padding-bottom: 124px; }
+/* Единственный скроллер экрана. min-height: 0 обязателен: без него
+   flex-элемент не сжимается меньше контента, .app растёт и скроллится body. */
+.content { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: 124px; }
 .pad { padding: 16px 16px 8px; }
 
 .row { display: flex; align-items: center; }

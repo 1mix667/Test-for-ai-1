@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from './lib/store';
 import { applyTheme } from './lib/theme';
 import KeysScreen from './screens/KeysScreen';
@@ -14,6 +14,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('chats');
   const topGlass = useGlass<HTMLDivElement>({ tint: 0.45, frost: 0.32, refraction: 30 });
   const fabGlass = useGlass<HTMLButtonElement>({ tint: 0.42, frost: 0.3, refraction: 30 });
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     void init();
@@ -37,9 +38,12 @@ export default function App() {
     if (ready) void applyTheme(settings.themeSeed);
   }, [ready, settings.themeSeed]);
 
-  // стекло в live:false — после смены таба фон под шапкой другой,
-  // помечаем его грязным, чтобы не остался старый слепок
+  // смена таба: контент у каждого таба свой, а скроллер общий —
+  // сбрасываем его наверх, иначе позиция скролла протечёт с другого таба
+  // под залипшую шапку. Стекло в live:false — после смены таба фон под
+  // шапкой другой, помечаем его грязным, чтобы не остался старый слепок
   useEffect(() => {
+    contentRef.current?.scrollTo({ top: 0 });
     refreshGlass();
   }, [tab]);
 
@@ -51,18 +55,20 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="topbar" ref={topGlass}>
-        <h1>
-          {tab === 'chats' ? 'Чаты' : tab === 'keys' ? 'Ключи' : 'Настройки'}
-          <span className="sub">
-            {tab === 'chats'
-              ? `${chats.length} диалогов · ${keys.filter((k) => k.status === 'valid').length} рабочих ключей`
-              : 'AnyKey Chat'}
-          </span>
-        </h1>
-      </div>
+      {/* Шапка — внутри скроллера: в покое лежит в потоке (контент не под ней),
+          при скролле залипает и плавает над контентом как стекло. */}
+      <div className="content" ref={contentRef}>
+        <div className="topbar" ref={topGlass}>
+          <h1>
+            {tab === 'chats' ? 'Чаты' : tab === 'keys' ? 'Ключи' : 'Настройки'}
+            <span className="sub">
+              {tab === 'chats'
+                ? `${chats.length} диалогов · ${keys.filter((k) => k.status === 'valid').length} рабочих ключей`
+                : 'AnyKey Chat'}
+            </span>
+          </h1>
+        </div>
 
-      <div className="content">
         {tab === 'chats' && (
           <div className="pad">
             {!chats.length && (
