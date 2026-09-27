@@ -8,10 +8,15 @@ export interface GlassOpts {
   tintTone?: 'light' | 'dark' | 'auto';
   frost?: number;
   refraction?: number;
+  dispersion?: number;
 }
 
 /**
  * Настоящее жидкое стекло (WebGL2-шейдер с рефракцией) на элемент.
+ * Параметры подобраны под «яблочный» вид: умеренная рефракция +
+ * заметный блюр. Сильная рефракция (80+) с высоким dispersion на
+ * телефонных GPU даёт «калейдоскоп»: волнистые двоения текста и
+ * радужные ореолы вместо стекла.
  * Без WebGL2 либа сама откатывается на CSS backdrop-filter.
  * Возвращает null, если инициализация не удалась.
  */
@@ -26,10 +31,14 @@ export function glassify(
     // кадр). Перерисовка идёт по факту: движение/скролл/ресайз помечают фон
     // грязным, анимацию линзы дока доводит refreshGlass().
     return new LiquidGlass(el, {
-      tint: opts.tint ?? 0.5,
+      tint: opts.tint ?? 0.45,
       tintTone: opts.tintTone ?? 'dark',
-      frost: opts.frost ?? 0.12,
-      material: { refraction: opts.refraction ?? 88, dispersion: 2.2 },
+      frost: opts.frost ?? 0.32,
+      material: {
+        refraction: opts.refraction ?? 32,
+        dispersion: opts.dispersion ?? 0.7,
+        backdropBlur: 5,
+      },
       live: false,
     });
   } catch {
