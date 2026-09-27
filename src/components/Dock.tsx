@@ -30,7 +30,7 @@ function haptic() {
  * WebGL2-шейдер с рефракцией (apple-liquid-glass-webgl).
  */
 export default function Dock({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
-  const dockGlass = useGlass<HTMLDivElement>({ tint: 0.35, tintTone: 'dark', frost: 0.1, refraction: 88 });
+  const dockGlass = useGlass<HTMLDivElement>({ tint: 0.34, frost: 0.3, refraction: 30 });
   const lensRef = useRef<HTMLDivElement>(null);
   const btnRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const glassRef = useRef<LiquidGlass | null>(null);
@@ -88,7 +88,7 @@ export default function Dock({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void
   // первичная инициализация: стекло + снап линзы под активный таб
   useEffect(() => {
     const lens = lensRef.current;
-    if (lens) glassRef.current = glassify(lens, { tint: 0.42, tintTone: 'dark', frost: 0.1, refraction: 92 });
+    if (lens) glassRef.current = glassify(lens, { tint: 0.4, frost: 0.3, refraction: 30 });
     const idx = TABS.findIndex((t) => t.id === tab);
     const m = measure(idx);
     if (m) {

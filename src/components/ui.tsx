@@ -10,7 +10,7 @@ export function Sheet({
   onClose: () => void;
   children: React.ReactNode;
 }) {
-  const glass = useGlass<HTMLDivElement>({ tint: 0.55, tintTone: 'dark', frost: 0.14, refraction: 88 });
+  const glass = useGlass<HTMLDivElement>({ tint: 0.52, frost: 0.34, refraction: 28 });
   return (
     <div className="sheet-backdrop" onClick={onClose}>
       <div className="sheet" ref={glass} onClick={(e) => e.stopPropagation()}>
