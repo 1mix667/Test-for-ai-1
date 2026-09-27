@@ -20,10 +20,8 @@ public class WallpaperColorsPlugin extends Plugin {
         try {
             WallpaperManager wm = WallpaperManager.getInstance(getContext());
             android.app.WallpaperColors colors = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 colors = wm.getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                colors = wm.getWallpaperColors();
             }
             JSObject ret = new JSObject();
             if (colors != null) {
