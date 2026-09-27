@@ -3,13 +3,14 @@
 # "Use codemagic.yaml" → запустить workflow android-apk и выбрать ветку.
 # APK придёт письмом и будет в артефактах сборки.
 
+
 workflows:
   android-apk:
     name: AnyKey Chat — Android APK
     instance_type: mac_mini_m2
     max_build_duration: 45
     environment:
-      node: 20
+      node: 22
       java: 21
     triggering:
       events:
