@@ -17,7 +17,7 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
   const scroller = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const topGlass = useGlass<HTMLDivElement>({ tint: 0.5, tintTone: 'dark', frost: 0.12, refraction: 88 });
-  const inputGlass = useGlass<HTMLDivElement>({ tint: 0.5, tintTone: 'dark', frost: 0.12, refraction: 88 });
+  const inputGlass = useGlass<HTMLDivElement>({ tint: 0.62, tintTone: 'dark', frost: 0.16, refraction: 88 });
   const streaming = streamingChatId === chat.id;
   const key = keys.find((k) => k.id === chat.keyId);
   const atBottom = useRef(true);
