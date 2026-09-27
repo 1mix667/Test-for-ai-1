@@ -4,6 +4,9 @@ import remarkGfm from 'remark-gfm';
 import { useStore, uid } from '../lib/store';
 import type { Attachment, Chat, Message } from '../lib/types';
 import { Field, Sheet } from '../components/ui';
+import {
+  IconBack, IconClip, IconDoc, IconGear, IconRefresh, IconSend, IconSparkle, IconStop,
+} from '../components/icons';
 
 export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () => void }) {
   const { send, stop, regenerate, deleteMessage, streamingChatId, keys, settings } = useStore();
@@ -51,40 +54,42 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
 
   return (
     <div className="app">
-      <div className="header">
-        <button className="iconbtn" onClick={onBack}>
-          ‹
+      <div className="topbar topbar-row">
+        <button className="iconbtn" aria-label="Назад" onClick={onBack}>
+          <IconBack size={22} />
         </button>
         <h1>
-          {chat.title}
+          <span className="ttl">{chat.title}</span>
           <span className="sub">
             {key ? `${key.name} · ${chat.model ?? 'модель не выбрана'}` : 'ключ не выбран'}
           </span>
         </h1>
-        <button className="iconbtn" onClick={() => setShowSettings(true)}>
-          ⚙
+        <button className="iconbtn" aria-label="Настройки чата" onClick={() => setShowSettings(true)}>
+          <IconGear size={22} />
         </button>
       </div>
 
-      <div className="content" ref={scroller} onScroll={onScroll}>
-        {!chat.messages.length && (
-          <div className="empty">
-            <div className="big">✨</div>
-            Спроси что угодно. Можно приложить фото или текстовый файл.
+      <div className="content" ref={scroller} onScroll={onScroll} style={{ paddingBottom: 12 }}>
+        <div className="pad">
+          {!chat.messages.length && (
+            <div className="empty">
+              <div className="big"><IconSparkle size={44} /></div>
+              Спроси что угодно. Можно приложить фото или текстовый файл.
+            </div>
+          )}
+          <div className="messages">
+            {chat.messages.map((m) => (
+              <MessageView key={m.id} m={m} onDelete={() => deleteMessage(chat.id, m.id)} />
+            ))}
           </div>
-        )}
-        <div className="messages">
-          {chat.messages.map((m) => (
-            <MessageView key={m.id} m={m} onDelete={() => deleteMessage(chat.id, m.id)} />
-          ))}
+          {!streaming && chat.messages.some((m) => m.role === 'assistant') && (
+            <div className="row" style={{ justifyContent: 'center', padding: '4px 0 14px' }}>
+              <button className="btn sm" onClick={() => regenerate(chat.id)}>
+                <IconRefresh size={16} /> Перегенерировать
+              </button>
+            </div>
+          )}
         </div>
-        {!streaming && chat.messages.some((m) => m.role === 'assistant') && (
-          <div className="row" style={{ justifyContent: 'center', padding: '4px 0 14px' }}>
-            <button className="btn sm" onClick={() => regenerate(chat.id)}>
-              ⟳ Перегенерировать
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="composer">
@@ -95,15 +100,15 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
                 {a.kind === 'image' ? (
                   <img src={`data:${a.mimeType};base64,${a.data}`} alt={a.name} />
                 ) : (
-                  <span className="chip">📄 {a.name} ✕</span>
+                  <span className="chip"><IconDoc size={14} /> {a.name} ✕</span>
                 )}
               </div>
             ))}
           </div>
         )}
         <div className="inputrow">
-          <button className="iconbtn" onClick={() => fileRef.current?.click()}>
-            📎
+          <button className="iconbtn" aria-label="Прикрепить файл" onClick={() => fileRef.current?.click()}>
+            <IconClip size={20} />
           </button>
           <input
             ref={fileRef}
@@ -129,12 +134,12 @@ export default function ChatScreen({ chat, onBack }: { chat: Chat; onBack: () =>
             }}
           />
           {streaming ? (
-            <button className="sendbtn stop" onClick={stop}>
-              ■
+            <button className="sendbtn stop" aria-label="Остановить" onClick={stop}>
+              <IconStop size={18} />
             </button>
           ) : (
-            <button className="sendbtn" disabled={!text.trim() && !attachments.length} onClick={doSend}>
-              ↑
+            <button className="sendbtn" aria-label="Отправить" disabled={!text.trim() && !attachments.length} onClick={doSend}>
+              <IconSend size={18} />
             </button>
           )}
         </div>
@@ -163,7 +168,7 @@ function MessageView({ m, onDelete }: { m: Message; onDelete: () => void }) {
         <div className="thumbs">
           {files.map((a) => (
             <span key={a.id} className="chip">
-              📄 {a.name}
+              <IconDoc size={14} /> {a.name}
             </span>
           ))}
         </div>
@@ -192,7 +197,7 @@ function MessageView({ m, onDelete }: { m: Message; onDelete: () => void }) {
               setTimeout(() => setCopied(false), 1200);
             }}
           >
-            {copied ? '✓ скопировано' : 'копировать'}
+            {copied ? 'скопировано' : 'копировать'}
           </button>
           <button onClick={onDelete}>удалить</button>
         </div>
@@ -266,7 +271,7 @@ function ChatSettings({ chat, onClose }: { chat: Chat; onClose: () => void }) {
               setLoading(false);
             }}
           >
-            {loading ? '…' : '⟳'}
+            {loading ? '…' : <IconRefresh size={16} />}
           </button>
         </div>
       </Field>

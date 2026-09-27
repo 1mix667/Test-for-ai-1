@@ -3,6 +3,7 @@ import { PROVIDERS, getProvider } from '../lib/providers';
 import type { ApiKey, Protocol } from '../lib/types';
 import { useStore } from '../lib/store';
 import { Field, Sheet } from '../components/ui';
+import { IconEye, IconEyeOff } from '../components/icons';
 
 export default function KeyEditor({ editing, onClose }: { editing: ApiKey | null; onClose: () => void }) {
   const { addKey, updateKey, verifyKey, deleteKey } = useStore();
@@ -83,7 +84,7 @@ export default function KeyEditor({ editing, onClose }: { editing: ApiKey | null
 
       <Field
         label="API-ключ"
-        hint={preset?.keyOptional ? 'Для локальных серверов можно оставить пустым' : preset?.keyHint}
+        hint={preset?.keyOptional ? 'Для локальных серверов можно оставить пустым' : undefined}
       >
         <div className="row">
           <input
@@ -96,8 +97,8 @@ export default function KeyEditor({ editing, onClose }: { editing: ApiKey | null
             placeholder={preset?.keyHint ?? 'вставь ключ'}
             onChange={(e) => setKey(e.target.value)}
           />
-          <button className="btn sm" onClick={() => setShowKey((v) => !v)}>
-            {showKey ? '🙈' : '👁'}
+          <button className="iconbtn" aria-label={showKey ? 'Скрыть ключ' : 'Показать ключ'} onClick={() => setShowKey((v) => !v)}>
+            {showKey ? <IconEyeOff size={20} /> : <IconEye size={20} />}
           </button>
         </div>
       </Field>

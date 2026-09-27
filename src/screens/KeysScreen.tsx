@@ -4,6 +4,7 @@ import { providerLabel } from '../lib/providers';
 import { detectKey, type DetectHit } from '../lib/detect';
 import type { ApiKey } from '../lib/types';
 import { Field, Sheet, StatusBadge } from '../components/ui';
+import { IconEdit, IconKey, IconPlus, IconRefresh, IconSearch } from '../components/icons';
 import KeyEditor from './KeyEditor';
 
 function mask(k: string) {
@@ -36,7 +37,7 @@ export default function KeysScreen() {
       <div className="pad">
         <div className="row between" style={{ marginBottom: 12 }}>
           <div className="col">
-            <b>Хранилище ключей</b>
+            <b className="ttl">Хранилище ключей</b>
             <span className="tiny">{keys.length} шт · хранятся только на этом телефоне</span>
           </div>
           <button
@@ -48,22 +49,22 @@ export default function KeysScreen() {
               setCheckingAll(false);
             }}
           >
-            {checkingAll ? '⟳ проверяю' : '⟳ Проверить все'}
+            <IconRefresh size={16} /> {checkingAll ? 'проверяю' : 'Проверить все'}
           </button>
         </div>
 
         <div className="row" style={{ gap: 10, marginBottom: 14 }}>
           <button className="btn primary grow" onClick={() => { setEditing(null); setShowEditor(true); }}>
-            + Добавить ключ
+            <IconPlus size={18} /> Добавить ключ
           </button>
           <button className="btn grow" onClick={() => setAutoOpen(true)}>
-            🔎 Определить по ключу
+            <IconSearch size={18} /> Определить по ключу
           </button>
         </div>
 
         {!keys.length && (
           <div className="empty">
-            <div className="big">🔑</div>
+            <div className="big"><IconKey size={44} /></div>
             Ключей пока нет.
             <br />
             Добавь любой — от OpenAI, Claude, Gemini, OpenRouter, локального сервера или частного прокси.
@@ -75,7 +76,7 @@ export default function KeysScreen() {
             <div className="row between">
               <div className="col grow">
                 <div className="row" style={{ gap: 8 }}>
-                  <b className="ellipsis">{k.name}</b>
+                  <b className="ellipsis ttl">{k.name}</b>
                 </div>
                 <div className="tiny ellipsis">
                   {providerLabel(k.providerId)} · {mask(k.key)}
@@ -133,7 +134,7 @@ export default function KeysScreen() {
 
           <div className="row" style={{ gap: 10 }}>
             <button className="btn grow" onClick={() => verifyKey(current.id)}>
-              ⟳ Проверить
+              <IconRefresh size={16} /> Проверить
             </button>
             <button
               className="btn primary grow"
@@ -143,7 +144,7 @@ export default function KeysScreen() {
                 setShowEditor(true);
               }}
             >
-              ✎ Изменить
+              <IconEdit size={16} /> Изменить
             </button>
           </div>
         </Sheet>
@@ -199,7 +200,7 @@ function AutoDetect({ onClose }: { onClose: () => void }) {
         <div key={h.provider.id} className="card" style={{ marginTop: 12 }}>
           <div className="row between">
             <b>{h.provider.name}</b>
-            <span className="badge ok">✓ {h.latencyMs} мс</span>
+            <span className="badge ok">{h.latencyMs} мс</span>
           </div>
           <div className="tiny" style={{ margin: '6px 0 10px' }}>{h.message}</div>
           <button

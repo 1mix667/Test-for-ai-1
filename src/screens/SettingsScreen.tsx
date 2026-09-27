@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useStore } from '../lib/store';
 import { Field, Sheet, Switch } from '../components/ui';
+import { SEED_PRESETS, SYSTEM_SEED } from '../lib/monet';
+import { IconLock, IconWallpaper } from '../components/icons';
 import type { ApiKey } from '../lib/types';
 
 export default function SettingsScreen() {
@@ -14,11 +16,39 @@ export default function SettingsScreen() {
   const [exportOpen, setExportOpen] = useState(false);
 
   const exportJson = JSON.stringify({ version: 1, keys, chats }, null, 2);
+  const curSeed = settings.themeSeed ?? SYSTEM_SEED;
 
   return (
     <div className="pad">
       <div className="card">
-        <b>Безопасность</b>
+        <b className="ttl">Оформление</b>
+        <div className="tiny" style={{ margin: '6px 0 10px' }}>
+          {curSeed === SYSTEM_SEED
+            ? 'Цвет интерфейса — из твоих обоев (Material You)'
+            : 'Свой цвет интерфейса'}
+        </div>
+        <div className="swatches">
+          <button
+            className={`swatch sys${curSeed === SYSTEM_SEED ? ' sel' : ''}`}
+            aria-label="Системный цвет"
+            onClick={() => saveSettings({ themeSeed: SYSTEM_SEED })}
+          >
+            <IconWallpaper size={22} />
+          </button>
+          {SEED_PRESETS.map((p) => (
+            <button
+              key={p.hex}
+              className={`swatch${curSeed === p.hex ? ' sel' : ''}`}
+              aria-label={p.name}
+              style={{ background: p.hex }}
+              onClick={() => saveSettings({ themeSeed: p.hex })}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <b className="ttl">Безопасность</b>
         <div className="tiny" style={{ margin: '6px 0 10px' }}>
           Ключи лежат в приватном хранилище приложения на телефоне — ни на какой сервер они не уходят. С PIN-кодом они
           дополнительно шифруются (AES-256-GCM, ключ из PIN через PBKDF2).
@@ -29,13 +59,13 @@ export default function SettingsScreen() {
           </button>
         ) : (
           <button className="btn full" onClick={() => setPinOpen(true)}>
-            🔒 Включить PIN-код
+            <IconLock size={18} /> Включить PIN-код
           </button>
         )}
       </div>
 
       <div className="card">
-        <b>Чат</b>
+        <b className="ttl">Чат</b>
         <Switch
           label="Стриминг ответа"
           hint="Текст появляется по мере генерации. Если провайдер не поддерживает — приложение само переключится."
@@ -81,16 +111,16 @@ export default function SettingsScreen() {
       </div>
 
       <div className="card">
-        <b>Данные</b>
+        <b className="ttl">Данные</b>
         <div className="tiny" style={{ margin: '6px 0 10px' }}>
           {keys.length} ключей · {chats.length} чатов
         </div>
         <div className="row" style={{ gap: 10 }}>
           <button className="btn grow" onClick={() => setExportOpen(true)}>
-            ⬆ Экспорт
+            Экспорт
           </button>
           <button className="btn grow" onClick={() => setImportOpen(true)}>
-            ⬇ Импорт ключей
+            Импорт ключей
           </button>
         </div>
         <button className="btn danger full" style={{ marginTop: 10 }} onClick={() => clearChats()}>
@@ -99,7 +129,7 @@ export default function SettingsScreen() {
       </div>
 
       <div className="card">
-        <b>AnyKey Chat</b>
+        <b className="ttl">AnyKey Chat</b>
         <div className="tiny" style={{ marginTop: 6 }}>
           Универсальный клиент для любых AI-API: OpenAI, Anthropic, Gemini, OpenRouter, Groq, DeepSeek, локальные
           серверы и любые совместимые прокси. Всё работает напрямую с телефона.
@@ -117,7 +147,7 @@ export default function SettingsScreen() {
           <Field label="Повтори PIN">
             <input type="password" value={pin2} onChange={(e) => setPin2(e.target.value)} inputMode="numeric" />
           </Field>
-          {err && <div className="tiny" style={{ color: 'var(--err)', marginBottom: 10 }}>{err}</div>}
+          {err && <div className="tiny" style={{ color: 'var(--m3-error)', marginBottom: 10 }}>{err}</div>}
           <button
             className="btn primary full"
             onClick={async () => {

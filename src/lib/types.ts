@@ -77,6 +77,8 @@ export interface Settings {
   defaultMaxTokens: number;
   autoTitle: boolean;
   allowInsecureHttp: boolean;
+  /** seed-цвет Monet: hex или 'system' (цвет обоев Android) */
+  themeSeed?: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {

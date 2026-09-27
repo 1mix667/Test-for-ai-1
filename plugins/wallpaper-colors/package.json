@@ -1,0 +1,1 @@
+{"capacitor":{"android":{"src":"android"}},"description":"Reads system wallpaper colors for dynamic Monet theming","files":["index.js","android/"],"license":"MIT","main":"index.js","name":"wallpaper-colors","version":"1.0.0"}

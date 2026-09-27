@@ -11,10 +11,13 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
+    "@material/material-color-utilities": "^0.4.0",
+    "apple-liquid-glass-webgl": "^2.5.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "wallpaper-colors": "file:plugins/wallpaper-colors",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from './lib/store';
+import { applyTheme } from './lib/theme';
 import KeysScreen from './screens/KeysScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import ChatScreen from './screens/ChatScreen';
+import Dock, { type Tab } from './components/Dock';
 import { Field } from './components/ui';
-
-type Tab = 'chats' | 'keys' | 'settings';
+import { IconChat, IconLock, IconPlus, IconTrash } from './components/icons';
 
 export default function App() {
-  const { ready, locked, init, chats, activeChatId, openChat, newChat, deleteChat, keys } = useStore();
+  const { ready, locked, init, chats, activeChatId, openChat, newChat, deleteChat, keys, settings } = useStore();
   const [tab, setTab] = useState<Tab>('chats');
 
   useEffect(() => {
@@ -28,6 +29,11 @@ export default function App() {
     return () => remove?.();
   }, []);
 
+  // тема: системный seed или выбранный пресет
+  useEffect(() => {
+    if (ready) void applyTheme(settings.themeSeed);
+  }, [ready, settings.themeSeed]);
+
   if (!ready) return <div className="empty" style={{ paddingTop: 120 }}>Загрузка…</div>;
   if (locked) return <LockScreen />;
 
@@ -36,7 +42,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="header">
+      <div className="topbar">
         <h1>
           {tab === 'chats' ? 'Чаты' : tab === 'keys' ? 'Ключи' : 'Настройки'}
           <span className="sub">
@@ -47,12 +53,12 @@ export default function App() {
         </h1>
       </div>
 
-      <div className="content" style={{ position: 'relative' }}>
+      <div className="content">
         {tab === 'chats' && (
           <div className="pad">
             {!chats.length && (
               <div className="empty">
-                <div className="big">💬</div>
+                <div className="big"><IconChat size={44} /></div>
                 Пока нет чатов.
                 <br />
                 {keys.length ? 'Нажми «+», чтобы начать.' : 'Сначала добавь API-ключ во вкладке «Ключи».'}
@@ -65,7 +71,7 @@ export default function App() {
                 <div key={c.id} className="card tap" onClick={() => openChat(c.id)}>
                   <div className="row between">
                     <div className="col grow">
-                      <b className="ellipsis">{c.title}</b>
+                      <b className="ellipsis ttl">{c.title}</b>
                       <div className="tiny ellipsis">
                         {last ? `${last.role === 'user' ? 'Ты: ' : ''}${(last.content || last.error || '').slice(0, 60)}` : 'пусто'}
                       </div>
@@ -73,12 +79,13 @@ export default function App() {
                     </div>
                     <button
                       className="iconbtn"
+                      aria-label="Удалить чат"
                       onClick={(e) => {
                         e.stopPropagation();
                         void deleteChat(c.id);
                       }}
                     >
-                      🗑
+                      <IconTrash size={20} />
                     </button>
                   </div>
                 </div>
@@ -90,23 +97,13 @@ export default function App() {
         {tab === 'settings' && <SettingsScreen />}
 
         {tab === 'chats' && (
-          <button className="fab" onClick={() => newChat()}>
-            +
+          <button className="fab" aria-label="Новый чат" onClick={() => newChat()}>
+            <IconPlus size={26} />
           </button>
         )}
       </div>
 
-      <div className="tabbar">
-        <button className={tab === 'chats' ? 'active' : ''} onClick={() => setTab('chats')}>
-          <span className="ic">💬</span>Чаты
-        </button>
-        <button className={tab === 'keys' ? 'active' : ''} onClick={() => setTab('keys')}>
-          <span className="ic">🔑</span>Ключи
-        </button>
-        <button className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}>
-          <span className="ic">⚙️</span>Настройки
-        </button>
-      </div>
+      <Dock tab={tab} onTab={setTab} />
     </div>
   );
 }
@@ -129,7 +126,7 @@ function LockScreen() {
 
   return (
     <div className="lock">
-      <div style={{ fontSize: 48 }}>🔒</div>
+      <div style={{ color: 'var(--m3-primary)' }}><IconLock size={52} /></div>
       <b>Введи PIN-код</b>
       <Field label="">
         <input
@@ -144,7 +141,7 @@ function LockScreen() {
           onKeyDown={(e) => e.key === 'Enter' && go()}
         />
       </Field>
-      {err && <div className="tiny" style={{ color: 'var(--err)' }}>Неверный PIN</div>}
+      {err && <div className="tiny" style={{ color: 'var(--m3-error)' }}>Неверный PIN</div>}
       <button className="btn primary" disabled={!pin || busy} onClick={go}>
         Разблокировать
       </button>
